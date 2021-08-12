@@ -27,7 +27,7 @@ def highlight_deleted(obj):
         Display in red lines when object is deleted.
     """
     obj_str = conditional_escape(text_type(obj))
-    if not getattr(obj, 'deleted', False):
+    if not getattr(obj, 'deleted_at', False):
         return obj_str
     else:
         return format_html('<span class="deleted">{0}</span>', obj_str)
@@ -49,9 +49,9 @@ class SafeDeleteAdmin(admin.ModelAdmin):
     """
     undelete_selected_confirmation_template = "safedelete/undelete_selected_confirmation.html"
 
-    list_display = ('deleted',)
-    list_filter = ('deleted',)
-    exclude = ('deleted',)
+    list_display = ('deleted_at',)
+    list_filter = ('deleted_at',)
+    exclude = ('deleted_at',)
     actions = ('undelete_selected',)
 
     class Meta:
@@ -99,7 +99,7 @@ class SafeDeleteAdmin(admin.ModelAdmin):
         assert hasattr(queryset, 'undelete')
 
         # Remove not deleted item from queryset
-        queryset = queryset.filter(deleted__isnull=False)
+        queryset = queryset.filter(deleted_at__isnull=False)
         # Undeletion confirmed
         if request.POST.get('post'):
             requested = queryset.count()
@@ -108,7 +108,7 @@ class SafeDeleteAdmin(admin.ModelAdmin):
                     obj_display = force_str(obj)
                     self.log_undeletion(request, obj, obj_display)
                 queryset.undelete()
-                changed = original_queryset.filter(deleted__isnull=True).count()
+                changed = original_queryset.filter(deleted_at__isnull=True).count()
                 if changed < requested:
                     self.message_user(
                         request,

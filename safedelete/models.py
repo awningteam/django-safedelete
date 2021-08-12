@@ -63,7 +63,7 @@ class SafeDeleteModel(models.Model):
 
     _safedelete_policy = SOFT_DELETE
 
-    deleted = models.DateTimeField(name='deleted_at', editable=False, null=True)
+    deleted_at = models.DateTimeField(editable=False, null=True)
 
     objects = SafeDeleteManager()
     all_objects = SafeDeleteAllManager()
@@ -91,9 +91,9 @@ class SafeDeleteModel(models.Model):
 
         was_undeleted = False
         if not keep_deleted:
-            if self.deleted and self.pk:
+            if self.deleted_at and self.pk:
                 was_undeleted = True
-            self.deleted = None
+            self.deleted_at = None
 
         super(SafeDeleteModel, self).save(**kwargs)
 
@@ -114,12 +114,12 @@ class SafeDeleteModel(models.Model):
         """
         current_policy = force_policy or self._safedelete_policy
 
-        assert self.deleted
+        assert self.deleted_at
         self.save(keep_deleted=False, **kwargs)
 
         if current_policy == SOFT_DELETE_CASCADE:
             for related in related_objects(self):
-                if is_safedelete_cls(related.__class__) and related.deleted:
+                if is_safedelete_cls(related.__class__) and related.deleted_at:
                     related.undelete()
 
     def delete(self, force_policy=None, **kwargs):
@@ -143,7 +143,7 @@ class SafeDeleteModel(models.Model):
         elif current_policy == SOFT_DELETE:
 
             # Only soft-delete the object, marking it as deleted.
-            self.deleted = timezone.now()
+            self.deleted_at = timezone.now()
             using = kwargs.get('using') or router.db_for_write(self.__class__, instance=self)
             # send pre_softdelete signal
             pre_softdelete.send(sender=self.__class__, instance=self, using=using)
@@ -168,7 +168,7 @@ class SafeDeleteModel(models.Model):
         elif current_policy == SOFT_DELETE_CASCADE:
             # Soft-delete on related objects before
             for related in related_objects(self):
-                if is_safedelete_cls(related.__class__) and not related.deleted:
+                if is_safedelete_cls(related.__class__) and not related.deleted_at:
                     related.delete(force_policy=SOFT_DELETE, **kwargs)
 
             # soft-delete the object

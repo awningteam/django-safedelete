@@ -122,11 +122,11 @@ class SafeDeleteManager(models.Manager):
         revived_soft_deleted_object = False
         if self.model.has_unique_fields():
             # Check if object is already soft-deleted
-            deleted_object = self.all_with_deleted().filter(**kwargs).exclude(deleted=None).first()
+            deleted_object = self.all_with_deleted().filter(**kwargs).exclude(deleted_at=None).first()
 
             # If object is soft-deleted, reset delete-state...
             if deleted_object and deleted_object._safedelete_policy in self.get_soft_delete_policies():
-                deleted_object.deleted = None
+                deleted_object.deleted_at = None
                 deleted_object.save()
                 revived_soft_deleted_object = True
 
