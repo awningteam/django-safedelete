@@ -82,7 +82,7 @@ class AdminTestCase(TestCase):
     def test_admin_model(self):
         changelist_default = self.get_changelist(self.request, Category, self.modeladmin_default)
         changelist = self.get_changelist(self.request, Category, self.modeladmin)
-        self.assertEqual(changelist.get_filters(self.request)[0][0].title, 'deleted')
+        self.assertEqual(changelist.get_filters(self.request)[0][0].title, 'deleted at')
         self.assertEqual(changelist.queryset.count(), 3)
         self.assertEqual(changelist_default.queryset.count(), 2)
 
@@ -110,7 +110,7 @@ class AdminTestCase(TestCase):
         category = Category.all_objects.get(
             pk=self.categories[1].pk
         )
-        self.assertTrue(self.categories[1].deleted)
+        self.assertTrue(self.categories[1].deleted_at)
 
         resp = self.client.post('/admin/safedelete/category/', data={
             'index': 0,
@@ -121,4 +121,4 @@ class AdminTestCase(TestCase):
         category = Category.objects.get(
             pk=self.categories[1].pk
         )
-        self.assertFalse(category.deleted)
+        self.assertFalse(category.deleted_at)
