@@ -8,6 +8,15 @@ Django safedelete
     :target: https://coveralls.io/r/makinacorpus/django-safedelete
 
 
+Fork Details
+------------
+
+This is a forked version of the original django-safedelete package, with the sole purpose of renaming the 'deleted'
+column to 'deleted_at' (since the column name is hardcoded into the code) so that we can maintain our '_at' naming
+convention for timestamp columns and do not need to rename every table's deletion column in order to use safedelete's
+functionality (handling soft-deletes across relations/cascades).
+
+
 What is it ?
 ------------
 
